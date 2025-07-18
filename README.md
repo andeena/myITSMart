@@ -42,4 +42,3 @@ Selamat datang di myITS Mart! Ini adalah proyek website e-commerce yang dibangun
 
 #### 4. Database Function
 - **`GetCustomerLevel`**: Menghitung level keanggotaan (Bronze, Silver, Gold) secara dinamis berdasarkan total belanja.
-- **`GetStockStatusMessage`**: Mengubah data angka stok menjadi pesan yang ramah pengguna ("Tersedia", "Stok Terbatas", "Stok Habis").

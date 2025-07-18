@@ -9,22 +9,23 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController; // <-- [BARU] Tambahkan ini
+use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Di sinilah Anda dapat mendaftarkan semua rute untuk aplikasi Anda.
-| Rute-rute ini dimuat oleh RouteServiceProvider dan semuanya akan
-| ditugaskan ke grup middleware "web".
-|
-*/
+Route::prefix('admin')->middleware(['auth', 'is_admin'])->name('admin.')->group(function () {
 
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::resource('products', AdminProductController::class);
 
-//======================================================================
-// RUTE PUBLIK (Dapat diakses oleh semua orang)
-//======================================================================
+    Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{order}/update-status', [AdminOrderController::class, 'updateStatus'])->name('orders.updateStatus');
+
+    Route::resource('users', AdminUserController::class)->except(['create', 'store', 'show']);
+
+});
 
 // Halaman utama / Welcome Page
 Route::get('/', [HomeController::class, 'index'])->name('home');

@@ -18,8 +18,8 @@ class HomeController extends Controller
         $bestSellingProducts = DB::select("
             SELECT
                 p.id,
-                p.product_name,      -- Menggunakan 'product_name'
-                p.list_price,        -- Menggunakan 'list_price'
+                p.product_name,      
+                p.list_price,        
                 SUM(od.quantity) AS total_sold
             FROM
                 products AS p
@@ -28,7 +28,7 @@ class HomeController extends Controller
             JOIN
                 orders AS o ON od.order_id = o.id
             WHERE
-                o.status IN ('Selesai', 'Shipped', 'Delivered') -- Menambahkan status 'Delivered'
+                o.status IN ('Selesai', 'Shipped', 'Delivered', 'Completed')
             GROUP BY
                 p.id, p.product_name, p.list_price -- Menyesuaikan GROUP BY
             ORDER BY

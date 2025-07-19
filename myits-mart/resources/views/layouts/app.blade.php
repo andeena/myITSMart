@@ -3,8 +3,6 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- CSRF token untuk keamanan form -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>@yield('title', 'myITS Mart')</title>
@@ -16,7 +14,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
 
-    <!-- Custom Style -->
     <style>
         html, body { height: 100%; }
         body {
@@ -32,8 +29,7 @@
     @stack('styles')
 </head>
 <body class="d-flex flex-column h-100">
-
-    <!-- Navigasi -->
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
         <div class="container">
             <a class="navbar-brand fw-bold" href="{{ route('home') }}">myITS Mart</a>
@@ -50,15 +46,14 @@
                         <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">Login</a></li>
                     @else
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" data-bs-toggle="dropdown">
                                 {{ Auth::user()->name }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" href="{{ route('dashboard') }}">Dashboard</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    <!-- Logout aman via POST + CSRF -->
-                                    <form method="POST" action="{{ route('logout') }}" id="logout-form">
+                                    <form method="POST" action="{{ route('logout') }}">
                                         @csrf
                                         <button type="submit" class="dropdown-item">Logout</button>
                                     </form>
@@ -71,7 +66,7 @@
         </div>
     </nav>
 
-    <!-- Konten Utama -->
+    <!-- Main Content -->
     <main class="py-4">
         <div class="container">
             @if (session('success'))
@@ -98,9 +93,10 @@
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
+    <!-- JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
     @stack('scripts')
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </body>
 </html>

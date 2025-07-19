@@ -25,7 +25,6 @@
 
 @section('content')
 <div class="row">
-    <!-- Kolom Kiri: Profil & Navigasi -->
     <div class="col-lg-4 mb-4">
         <div class="card profile-card text-center shadow-sm h-100">
             <div class="card-body d-flex flex-column">
@@ -35,7 +34,6 @@
                 <h4 class="card-title">{{ Auth::user()->name }}</h4>
                 <p class="text-muted">{{ Auth::user()->email }}</p>
                 
-                <!-- [BARU] Menampilkan Lencana Level Keanggotaan -->
                 <div class="mb-3">
                     @php
                         $levelClass = 'level-bronze'; // Default

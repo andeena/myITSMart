@@ -12,15 +12,15 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // 1. Ambil data untuk kartu statistik
-        $totalRevenue = Order::whereIn('status', ['Selesai', 'completed', 'Shipped', 'Delivered'])->sum('total_amount');
+        $totalRevenue = DB::table('orders')
+            ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+            ->whereIn('orders.status', ['Selesai', 'completed', 'Shipped', 'Delivered'])
+            ->sum(DB::raw('order_details.quantity * order_details.unit_price'));
         $newOrdersCount = Order::where('status', 'Pending')->count();
         $totalCustomers = User::where('role', 'customer')->count();
 
-        // 2. Ambil 5 pesanan terbaru
         $recentOrders = Order::with('customer')->latest()->take(5)->get();
 
-        // 3. Ambil 5 produk terlaris (menggunakan query JOIN)
         $bestSellingProducts = DB::select("
             SELECT p.product_name, SUM(od.quantity) AS total_sold
             FROM products AS p
@@ -32,7 +32,6 @@ class DashboardController extends Controller
             LIMIT 5
         ");
         
-        // 4. Kirim semua data ke view
         return view('admin.dashboard', compact(
             'totalRevenue',
             'newOrdersCount',

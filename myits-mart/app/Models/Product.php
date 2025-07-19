@@ -26,6 +26,7 @@ class Product extends Model
         'stock',
         'product_category',
         'description',
+        'image',
     ];
 
     /**

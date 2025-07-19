@@ -80,4 +80,20 @@ class DashboardController extends Controller
         
         return view('dashboard.my-wishlist', compact('wishlistItems'));
     }
+
+    public function showOrder(Order $order)
+    {
+        // Keamanan: Pastikan user hanya bisa melihat order miliknya sendiri
+        if ($order->customer_id !== Auth::id()) {
+            abort(403);
+        }
+
+        // Ambil ID produk yang sudah diulas oleh user ini
+        $reviewedProductIds = Auth::user()->reviews()->pluck('product_id')->toArray();
+
+        // Eager load semua relasi yang dibutuhkan
+        $order->load('details.product', 'shipper', 'logs');
+
+        return view('dashboard.order-detail', compact('order', 'reviewedProductIds'));
+    }
 }

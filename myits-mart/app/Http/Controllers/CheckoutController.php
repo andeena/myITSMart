@@ -8,6 +8,8 @@ use App\Models\Shipper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Midtrans\Config;
+use Midtrans\Snap;
 
 class CheckoutController extends Controller
 {
@@ -20,16 +22,15 @@ class CheckoutController extends Controller
         $cartItems = $user->cartItems()->with('product')->get();
 
         if ($cartItems->isEmpty()) {
-            return redirect()->route('cart.index')->with('info', 'Keranjang Anda kosong. Silakan belanja dulu.');
+            return redirect()->route('cart.index')->with('info', 'Keranjang Anda kosong.');
         }
 
-        // [PERBAIKAN] Menggunakan 'list_price' sesuai nama kolom di database
         $total = $cartItems->sum(function($item) {
             return $item->product ? ($item->product->list_price * $item->quantity) : 0;
         });
         
         $shippers = Shipper::all();
-
+        
         return view('checkout.index', compact('cartItems', 'total', 'shippers'));
     }
 
@@ -44,20 +45,28 @@ class CheckoutController extends Controller
         ]);
         
         $user = Auth::user();
-        $cartItems = $user->cartItems()->with('product')->get(); // Pastikan 'with('product')' ada
+        // [PERBAIKAN] Ambil cartItems sekali saja dengan relasi produknya
+        $cartItems = $user->cartItems()->with('product')->get();
 
         if ($cartItems->isEmpty()) {
-            return redirect()->route('home');
+            return redirect()->route('home')->with('error', 'Keranjang Anda kosong.');
         }
 
-        // [PERBAIKIKAN] Hitung total di luar transaction
+        // [PERBAIKAN] Hitung total di luar transaction
         $total = $cartItems->sum(function($item) {
             return $item->product ? ($item->product->list_price * $item->quantity) : 0;
         });
 
+        if ($total <= 0) {
+            return redirect()->route('cart.index')->with('error', 'Tidak ada item untuk di-checkout.');
+        }
+
+        $order = null;
+
         try {
-            DB::transaction(function () use ($user, $cartItems, $request, $total) {
-                // Buat record di tabel 'orders', gunakan variabel $total
+            // [PERBAIKAN] Lempar variabel $total ke dalam transaction
+            DB::transaction(function () use ($user, $cartItems, $request, $total, &$order) {
+                
                 $order = Order::create([
                     'customer_id' => $user->id,
                     'order_date' => now(),
@@ -67,9 +76,8 @@ class CheckoutController extends Controller
                     'status' => 'Pending',
                 ]);
 
-                // Pindahkan item dari keranjang ke 'order_details'
                 foreach ($cartItems as $item) {
-                    if ($item->product) { // Tambahan keamanan
+                    if ($item->product) {
                         OrderDetail::create([
                             'order_id' => $order->id,
                             'product_id' => $item->product_id,
@@ -79,14 +87,37 @@ class CheckoutController extends Controller
                     }
                 }
 
-                // Kosongkan keranjang user
                 $user->cartItems()->delete();
             });
 
         } catch (\Exception $e) {
-            return redirect()->route('checkout.index')->with('error', 'Terjadi kesalahan. Error: ' . $e->getMessage());
+            return redirect()->route('checkout.index')->with('error', 'Terjadi kesalahan saat memproses pesanan. Error: ' . $e->getMessage());
         }
 
-        return redirect()->route('dashboard.orders')->with('success', 'Pesanan Anda berhasil dibuat!');
+        // --- Bagian Midtrans ---
+        
+        // Konfigurasi Midtrans
+        Config::$serverKey = config('services.midtrans.serverKey');
+        Config::$isProduction = config('services.midtrans.isProduction', false);
+        Config::$isSanitized = true;
+        Config::$is3ds = true;
+
+        // Buat array untuk detail transaksi Midtrans
+        $params = [
+            'transaction_details' => [
+                'order_id' => $order->id,
+                'gross_amount' => $order->total_amount,
+            ],
+            'customer_details' => [
+                'first_name' => $user->name,
+                'email' => $user->email,
+            ],
+        ];
+        
+        // Dapatkan Snap Token dari Midtrans
+        $snapToken = Snap::getSnapToken($params);
+        
+        // Kirim Snap Token ke view pembayaran
+        return view('checkout.payment', compact('snapToken'));
     }
 }

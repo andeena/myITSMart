@@ -41,4 +41,5 @@ class DashboardController extends Controller
             'bestSellingProducts'
         ));
     }
+
 }

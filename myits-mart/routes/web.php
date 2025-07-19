@@ -13,6 +13,9 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController; // <-- [BARU] Tambahkan ini
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\MidtransController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\RajaOngkirController;
 
 Route::prefix('admin')->middleware(['auth', 'is_admin'])->name('admin.')->group(function () {
 
@@ -58,25 +61,31 @@ Route::middleware('auth')->group(function () {
     Route::post('/ulasan/simpan/{product}', [ReviewController::class, 'store'])->name('reviews.store');
 
 
-Route::prefix('dashboard')->middleware('auth')->group(function () {
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/pesanan', [DashboardController::class, 'orders'])->name('dashboard.orders');
-    Route::get('/pesanan/{order}', [DashboardController::class, 'showOrder'])->name('dashboard.orders.show');
-    
-    Route::get('/ulasan', [DashboardController::class, 'myReviews'])->name('dashboard.my-reviews');
-    Route::get('/wishlist', [DashboardController::class, 'myWishlist'])->name('dashboard.my-wishlist');
+    Route::prefix('dashboard')->middleware('auth')->group(function () {
+        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/pesanan', [DashboardController::class, 'orders'])->name('dashboard.orders');
+        Route::get('/pesanan/{order}', [DashboardController::class, 'showOrder'])->name('dashboard.orders.show');
+        
+        Route::get('/ulasan', [DashboardController::class, 'myReviews'])->name('dashboard.my-reviews');
+        Route::get('/wishlist', [DashboardController::class, 'myWishlist'])->name('dashboard.my-wishlist');
 
-});
+    });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/pembayaran/{order}', [PaymentController::class, 'pay'])->name('payment.pay');
+
+    // Route::post('/ongkir/cek', [RajaOngkirController::class, 'cekOngkir'])->name('ongkir.cek');
 });
 
+Route::post('/midtrans/callback', [MidtransController::class, 'callback']);
+
+// Route::get('/api/provinces', [RajaOngkirController::class, 'getProvinces'])->name('api.provinces');
+// Route::get('/api/cities/{province_id}', [RajaOngkirController::class, 'getCities'])->name('api.cities');
 
 //======================================================================
 // RUTE AUTENTIKASI (Login, Register, Logout, dll.)
 //======================================================================
-// Baris ini secara otomatis memuat semua rute yang dibutuhkan untuk
-// autentikasi dari Laravel Breeze (login, register, logout, lupa password, dll).
 require __DIR__.'/auth.php';

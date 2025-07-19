@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Cache;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,11 +16,13 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $categories = Product::select('product_category')
+        $categories = Cache::rememberForever('categories_list', function () {
+            return Product::select('product_category')
                             ->whereNotNull('product_category')
                             ->distinct()
                             ->orderBy('product_category', 'asc')
                             ->get();
+        });
 
         $query = Product::query();
 

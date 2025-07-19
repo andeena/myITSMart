@@ -4,14 +4,15 @@
 
 @section('content')
 <div class="row">
-    <!-- Kolom Kiri: Sidebar Filter Kategori -->
     <div class="col-lg-3">
         <h4 class="mb-3">Kategori Produk</h4>
-        <div class="list-group shadow-sm">
+        <div class="list-group shadow-sm mb-4">
+            {{-- Tombol untuk menampilkan semua kategori --}}
             <a href="{{ route('products.index') }}" 
                class="list-group-item list-group-item-action {{ !request('kategori') ? 'active' : '' }}">
                 Semua Kategori
             </a>
+            {{-- Loop untuk setiap kategori yang ada di database --}}
             @foreach ($categories as $category)
                 <a href="{{ route('products.index', ['kategori' => $category->product_category]) }}" 
                    class="list-group-item list-group-item-action {{ request('kategori') == $category->product_category ? 'active' : '' }}">
@@ -21,60 +22,67 @@
         </div>
     </div>
 
-    <!-- Kolom Kanan: Daftar Produk -->
     <div class="col-lg-9">
         <h1 class="mb-4">Katalog Produk</h1>
-        <div class="row">
-            @forelse ($products as $product)
-                <div class="col-md-6 col-lg-4 mb-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <img src="{{ $product->image_url }}" class="card-img-top" alt="{{ $product->name }}" style="height: 200px; object-fit: cover;">
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title">{{ $product->name }}</h5>
-                            <p class="card-text fw-bold text-primary fs-5">{{ $product->formatted_price }}</p>
-                            
-                            {{-- [PERBAIKAN] Tombol diletakkan sejajar di bawah --}}
-                            <div class="d-flex justify-content-between align-items-center mt-auto">
-                                <a href="{{ route('products.show', $product) }}" class="btn btn-outline-primary">Lihat Detail</a>
-                                
-                                {{-- Tombol Wishlist --}}
-                                <div>
-                                    @if (Auth::check() && in_array($product->id, $wishlistedProductIds))
-                                        {{-- Form Hapus dari Wishlist (Ikon Hati Penuh) --}}
-                                        <form action="{{ route('wishlist.remove', $product) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-link text-danger p-0" title="Hapus dari Wishlist">
-                                                <i class="fas fa-heart fs-4"></i>
-                                            </button>
-                                        </form>
-                                    @else
-                                        {{-- Form Tambah ke Wishlist (Ikon Hati Kosong) --}}
-                                        <form action="{{ route('wishlist.add', $product) }}" method="POST">
-                                            @csrf
-                                            <button type="submit" class="btn btn-link text-danger p-0" title="Tambah ke Wishlist">
-                                                <i class="far fa-heart fs-4"></i>
-                                            </button>
-                                        </form>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @empty
-                <div class="col-12">
-                    <div class="alert alert-info">
-                        Tidak ada produk yang ditemukan untuk kategori ini.
-                    </div>
-                </div>
-            @endforelse
+
+        <div class="mb-4">
+            <input type="search" id="product-search-input" class="form-control form-control-lg" placeholder="Cari nama produk...">
         </div>
 
-        <!-- Link Paginasi -->
-        <div class="d-flex justify-content-center mt-4">
+        <div id="product-list-container">
+            {{-- Memuat daftar produk awal dari partial view --}}
+            @include('products._product_list', ['products' => $products])
+        </div>
+        
+        <div id="pagination-container" class="d-flex justify-content-center mt-4">
             {{ $products->links() }}
         </div>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('product-search-input');
+    const productContainer = document.getElementById('product-list-container');
+    const paginationContainer = document.getElementById('pagination-container');
+    let searchTimeout;
+
+    searchInput.addEventListener('keyup', function() {
+        clearTimeout(searchTimeout);
+
+        searchTimeout = setTimeout(() => {
+            const query = this.value;
+            fetchProducts(query);
+        }, 500); // 500 milidetik delay
+    });
+
+    function fetchProducts(query) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const category = urlParams.get('kategori') || '';
+
+        const url = `/api/products/search?query=${encodeURIComponent(query)}&kategori=${encodeURIComponent(category)}`;
+
+        productContainer.innerHTML = '<div class="text-center p-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+        paginationContainer.innerHTML = ''; // Kosongkan paginasi saat loading
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                productContainer.innerHTML = data.products_html;
+                paginationContainer.innerHTML = data.pagination_html;
+            })
+            .catch(error => {
+                console.error('Error fetching products:', error);
+                productContainer.innerHTML = '<div class="alert alert-danger">Gagal memuat produk. Silakan coba lagi.</div>';
+            });
+    }
+});
+</script>
+@endpush

@@ -21,11 +21,11 @@ class InitialDatabaseSeeder extends Seeder
 
         // 1. Tambah Customer
         $customer = Customer::create([
-            'name'           => 'Andina Test 1',
-            'email_address'  => 'andinatest1@mail.com',
+            'name'           => 'Andina Test 2',
+            'email_address'  => 'andinatest2@mail.com',
             'mobile_phone'   => '08123456789',
             'address'        => 'Jl. Contoh No.123',
-            'password'       => Hash::make('password123'),
+            'password'       => Hash::make('andinatest2'),
             'membership'     => false,
             'loyalty_points' => 0,
             'created_at'     => $now,
@@ -34,9 +34,9 @@ class InitialDatabaseSeeder extends Seeder
 
         // 2. Tambah User dengan customer_id
         $user = User::create([
-            'name'              => 'Andina Test 1',
-            'email'             => 'andinatest1@mail.com',
-            'password'          => Hash::make('password123'),
+            'name'              => 'Andina Test 2',
+            'email'             => 'andinatest2@mail.com',
+            'password'          => Hash::make('andinatest2'),
             'role'              => 'customer',
             'customer_id'       => $customer->id,
             'email_verified_at' => $now,

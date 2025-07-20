@@ -34,6 +34,7 @@ class Order extends Model
         'total_amount',
         'ship_address',
         'status',
+        'loyalty_points', 
     ];
 
     /**

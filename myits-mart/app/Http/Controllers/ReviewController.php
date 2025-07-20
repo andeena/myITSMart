@@ -28,9 +28,10 @@ class ReviewController extends Controller
                 return redirect()->back()->with('error', 'Anda sudah pernah memberikan ulasan untuk produk ini.');
             }
 
+            $customer = Auth::user()->customer;
             // Trigger 'before_review_insert_check_purchase' akan otomatis berjalan di sini!
             $product->reviews()->create([
-                'customer_id' => Auth::id(),
+                'customer_id' => $customer->id,
                 'rating' => $request->rating,
                 'comment' => $request->comment,
             ]);

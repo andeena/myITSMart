@@ -26,21 +26,18 @@
                                     $statusDisplay = $details->first()->order_status ?? 'N/A';
                                 @endphp
                                 
-                                {{-- Menampilkan lencana status --}}
                                 @if (in_array($statusClean, ['selesai', 'completed', 'delivered', 'shipped']))
                                     <span class="badge bg-success p-2 me-3">{{ $statusDisplay }}</span>
                                 @else
                                     <span class="badge bg-info text-dark p-2 me-3">{{ $statusDisplay }}</span>
                                 @endif
                                 
-                                {{-- [PERBAIKAN] Tampilkan tombol 'Bayar' HANYA jika status 'pending' --}}
                                 @if ($statusClean === 'pending')
                                     <a href="{{ route('payment.pay', $order_id) }}" class="btn btn-sm btn-success me-2">
                                         Bayar Sekarang
                                     </a>
                                 @endif
                                 
-                                {{-- Tombol 'Lihat Detail' sekarang selalu ada --}}
                                 <a href="{{ route('dashboard.orders.show', $order_id) }}" class="btn btn-sm btn-outline-secondary">
                                     Lihat Detail
                                 </a>
@@ -86,9 +83,9 @@
                 </div>
                 @if($details->isNotEmpty())
                 <div class="card-footer text-end">
-                    <strong class="me-3">Total Belanja (sebelum ongkir)</strong>
+                    <strong class="me-3">Total Belanja</strong>
                     <span class="fs-5 fw-bold text-primary">
-                        Rp {{ number_format($details->first()->total_amount ?? 0, 0, ',', '.') }}
+                        Rp {{ number_format($details->sum('subtotal'), 0, ',', '.') }}
                     </span>
                 </div>
                 @endif
@@ -117,19 +114,19 @@
               @csrf
               <div class="modal-body">
                   <div class="mb-3">
-                    <label class="form-label">Rating Anda</label>
-                    <select class="form-select" name="rating" required>
-                      <option value="">-- Pilih Bintang --</option>
-                      <option value="5">★★★★★</option>
-                      <option value="4">★★★★☆</option>
-                      <option value="3">★★★☆☆</option>
-                      <option value="2">★★☆☆☆</option>
-                      <option value="1">★☆☆☆☆</option>
-                    </select>
+                      <label class="form-label">Rating Anda</label>
+                      <select class="form-select" name="rating" required>
+                        <option value="">-- Pilih Bintang --</option>
+                        <option value="5">★★★★★</option>
+                        <option value="4">★★★★☆</option>
+                        <option value="3">★★★☆☆</option>
+                        <option value="2">★★☆☆☆</option>
+                        <option value="1">★☆☆☆☆</option>
+                      </select>
                   </div>
                   <div class="mb-3">
-                    <label class="form-label">Komentar Anda</label>
-                    <textarea class="form-control" name="comment" rows="4" required></textarea>
+                      <label class="form-label">Komentar Anda</label>
+                      <textarea class="form-control" name="comment" rows="4" required></textarea>
                   </div>
               </div>
               <div class="modal-footer">

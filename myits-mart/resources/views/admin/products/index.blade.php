@@ -60,7 +60,11 @@
                             <td>{{ $product->id }}</td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <img src="{{ $product->image_url }}" alt="{{ $product->product_name }}" class="me-3 rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                                    @if ($product->image)
+                                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->product_name }}" class="me-3 rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                                    @else
+                                        <img src="https://placehold.co/40x40/eef2f7/869ab8?text=N/A" alt="No image" class="me-3 rounded">
+                                    @endif
                                     <span class="fw-bold">{{ $product->product_name }}</span>
                                 </div>
                             </td>

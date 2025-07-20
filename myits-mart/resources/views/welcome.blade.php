@@ -42,7 +42,7 @@
         right: 0;
         bottom: 0;
         left: 0;
-        background-image: url('{{ asset('storage/its mart.jpg') }}');
+        background-image: url('{{ asset('storage/its-mart.jpg') }}');
         background-size: cover;
         background-position: center;
         z-index: 1; 
@@ -71,9 +71,7 @@
                 @foreach ($bestSellingProducts as $product)
                     <div class="col-md-4 col-lg-3 mb-4">
                         <div class="card product-card h-100 shadow-sm">
-                            {{-- [PERBAIKAN] Menggunakan accessor dari model Product untuk konsistensi --}}
                             @php
-                                // Ambil instance model Product berdasarkan ID agar bisa pakai accessor
                                 $productModel = \App\Models\Product::find($product->id);
                             @endphp
                             <img src="{{ $productModel ? $productModel->image_url : 'https://placehold.co/600x400' }}" class="card-img-top" alt="{{ $product->product_name }}" style="height: 200px; object-fit: cover;">
@@ -120,7 +118,6 @@
                 @foreach ($featuredProducts as $product)
                     <div class="col-md-4 col-lg-3 mb-4">
                         <div class="card product-card h-100 shadow-sm">
-                            {{-- [PERBAIKAN] Memanggil accessor 'image_url' dengan benar --}}
                             <img src="{{ $product->image_url }}" class="card-img-top" alt="{{ $product->name }}" style="height: 200px; object-fit: cover;">
                             <div class="card-body d-flex flex-column">
                                 <h5 class="card-title">{{ $product->name }}</h5>

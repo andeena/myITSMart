@@ -47,7 +47,7 @@ class InitialDatabaseSeeder extends Seeder
 
         // 3. Tambah Shipper
         $shipper = Shipper::create([
-            'name'       => 'FastExpress',
+            'company_name'       => 'FastExpress',
             'phone'      => '081234567890',
             'created_at' => $now,
             'updated_at' => $now,

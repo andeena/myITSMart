@@ -13,8 +13,8 @@ class OrderController extends Controller
      */
     public function index()
     {
-        // Ambil semua pesanan, muat relasi customer, urutkan dari yang terbaru, dan paginasi
-        $orders = Order::with('customer')->latest()->paginate(15);
+        // Ambil semua pesanan dengan relasi customer dan detail produk
+        $orders = Order::with(['customer', 'details.product'])->latest()->paginate(15);
         return view('admin.orders.index', compact('orders'));
     }
 
@@ -30,6 +30,7 @@ class OrderController extends Controller
 
     /**
      * Memperbarui status pesanan.
+     * Jika status berubah ke "Completed", trigger akan aktif.
      */
     public function updateStatus(Request $request, Order $order)
     {
@@ -37,11 +38,16 @@ class OrderController extends Controller
             'status' => 'required|string|in:Pending,Processing,Shipped,Delivered,Completed,Cancelled',
         ]);
 
-        $order->status = $request->status;
-        $order->save();
+        $oldStatus = $order->status;
+        $newStatus = $request->status;
 
-    
+        // Cek apakah status berubah agar trigger bisa berjalan
+        if ($oldStatus !== $newStatus) {
+            $order->status = $newStatus;
+            $order->save(); // Trigger akan aktif jika status berubah
+        }
+
         return redirect()->route('admin.orders.show', $order)
-                         ->with('success', 'Status pesanan berhasil diperbarui.');
+                         ->with('success', "Status pesanan diubah dari '$oldStatus' ke '$newStatus'.");
     }
 }

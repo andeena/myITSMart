@@ -19,7 +19,8 @@ class HomeController extends Controller
             SELECT
                 p.id,
                 p.product_name,      
-                p.list_price,        
+                p.list_price, 
+                p.image,       
                 SUM(od.quantity) AS total_sold
             FROM
                 products AS p

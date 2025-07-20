@@ -1,0 +1,4 @@
+providers = ["php", "nginx"]
+
+[phases.start]
+cmd = "php-fpm & nginx -c /app/nginx.conf -g 'daemon off;'"

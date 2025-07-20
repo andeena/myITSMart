@@ -7,7 +7,7 @@ use App\Http\Requests\StoreProductRequest;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-// use Intervention\Image\Laravel\Facades\Image;
+use Intervention\Image\Laravel\Facades\Image;
 
 class ProductController extends Controller
 {

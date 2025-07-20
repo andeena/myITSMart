@@ -7,7 +7,6 @@ use App\Http\Requests\StoreProductRequest;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Laravel\Facades\Image;
 
 class ProductController extends Controller
 {
@@ -43,14 +42,8 @@ class ProductController extends Controller
             $file = $request->file('image');
             $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
             
-            $image = Image::read($file);
-            $image->resize(800, 800, function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            });
-
-            $path = 'products/' . $fileName;
-            Storage::disk('public')->put($path, $image->toJpeg(75));
+            // Kode resize gambar diganti dengan fungsi upload standar Laravel
+            $path = $file->storeAs('products', $fileName, 'public');
             
             $data['image'] = $path;
         }
@@ -78,14 +71,8 @@ class ProductController extends Controller
             $file = $request->file('image');
             $fileName = uniqid() . '.' . $file->getClientOriginalExtension();
             
-            $image = Image::read($file);
-            $image->resize(800, 800, function ($constraint) {
-                $constraint->aspectRatio();
-                $constraint->upsize();
-            });
-
-            $path = 'products/' . $fileName;
-            Storage::disk('public')->put($path, $image->toJpeg(75));
+            // Kode resize gambar diganti juga di sini
+            $path = $file->storeAs('products', $fileName, 'public');
             
             $data['image'] = $path;
         }

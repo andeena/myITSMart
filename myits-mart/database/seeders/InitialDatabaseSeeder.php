@@ -19,8 +19,8 @@ class InitialDatabaseSeeder extends Seeder
         // 1. Tambah Customer
         $customer = Customer::create([
             'name' => 'Andina Test 1',
-            // 'created_at' => now(),
-            // 'updated_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         // 2. Tambah User dengan customer_id

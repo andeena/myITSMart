@@ -30,7 +30,7 @@ class ReviewController extends Controller
 
             // Trigger 'before_review_insert_check_purchase' akan otomatis berjalan di sini!
             $product->reviews()->create([
-                'customer_id' => Auth::id(),
+                'user_id' => Auth::id(),
                 'rating' => $request->rating,
                 'comment' => $request->comment,
             ]);

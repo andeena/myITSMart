@@ -1,4 +1,6 @@
-providers = ["php", "nginx"]
+[phases.setup]
+pkgs = ["pkgs.nginx"]
 
+# Menjalankan PHP dan Nginx secara bersamaan
 [phases.start]
 cmd = "php-fpm & nginx -c /app/nginx.conf -g 'daemon off;'"

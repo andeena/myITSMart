@@ -24,7 +24,7 @@ class Review extends Model
         'product_id',
         'rating',
         'comment',
-        'customer_id'
+        // 'customer_id'
     ];
 
     /**
@@ -40,7 +40,7 @@ class Review extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');    
+        return $this->belongsTo(User::class, 'customer_id');    
     }
 
     /**
